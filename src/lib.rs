@@ -279,6 +279,10 @@ impl Drop for Cursor {
 
 #[cfg(test)]
 mod tests {
+    use wiredtiger_sys::{
+        WIREDTIGER_VERSION_MAJOR, WIREDTIGER_VERSION_MINOR, WIREDTIGER_VERSION_PATCH,
+    };
+
     use super::*;
 
     #[test]
