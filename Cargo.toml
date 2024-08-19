@@ -6,7 +6,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-wiredtiger-sys = { path = "wiredtiger-sys" }
+wiredtiger-sys = { path = "wiredtiger-sys", version = "0.3.1-rc0" } # should always match our version
 
 [dev-dependencies]
 anyhow = "1.0.86"
