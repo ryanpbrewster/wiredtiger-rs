@@ -1,6 +1,7 @@
 use std::{
-    ffi::{c_int, CStr, CString},
+    ffi::{c_int, CStr, CString, NulError},
     fmt::Display,
+    io,
     os::unix::ffi::OsStrExt,
     path::Path,
 };
@@ -13,16 +14,24 @@ pub enum Error {
     Placeholder(String),
     Unknown { errno: c_int },
 }
-impl<E: std::error::Error> From<E> for Error {
-    fn from(value: E) -> Self {
-        Self::Placeholder(value.to_string())
-    }
-}
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
+impl std::error::Error for Error {}
+
+impl From<NulError> for Error {
+    fn from(value: NulError) -> Self {
+        Self::Placeholder(value.to_string())
+    }
+}
+impl From<io::Error> for Error {
+    fn from(value: io::Error) -> Self {
+        Self::Placeholder(value.to_string())
+    }
+}
+
 impl Error {
     fn from_wt(errno: c_int) -> Self {
         let msg = unsafe {
