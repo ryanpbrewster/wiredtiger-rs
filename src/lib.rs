@@ -282,6 +282,19 @@ mod tests {
     use super::*;
 
     #[test]
+    fn version_check() {
+        // If this test fails, you probably need to bump the crate version too.
+        assert_eq!(
+            [
+                WIREDTIGER_VERSION_MAJOR,
+                WIREDTIGER_VERSION_MINOR,
+                WIREDTIGER_VERSION_PATCH
+            ],
+            [3, 1, 0]
+        );
+    }
+
+    #[test]
     fn it_works() -> Result<()> {
         let dir = tempfile::tempdir()?;
         let mut conn = Connection::open(dir.path())?;
