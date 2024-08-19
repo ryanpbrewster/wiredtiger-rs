@@ -1,12 +1,12 @@
 [package]
 name = "wiredtiger-rs"
-version = "0.3.1-rc0" # libwiredtiger v3.1.0
+version = "0.3.1-rc1" # libwiredtiger v3.1.0
 description = "Rust bindings for libwiredtiger"
 edition = "2021"
 license = "MIT"
 
 [dependencies]
-wiredtiger-sys = { path = "wiredtiger-sys", version = "0.3.1-rc0" } # should always match our version
+wiredtiger-sys = { path = "wiredtiger-sys", version = "0.3.1-rc1" } # should always match our version
 
 [dev-dependencies]
 anyhow = "1.0.86"
