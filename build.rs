@@ -6,14 +6,26 @@ fn main() {
 
     let out_dir = std::env::var("OUT_DIR").expect("OUT_DIR env var");
 
-    let output = Command::new("tar")
-        .arg("--extract")
-        .arg("--file=vendor/3.1.0.tar.gz")
-        .arg(format!("--directory={out_dir}"))
-        .arg("--strip-components=2")
+    std::env::set_current_dir(out_dir).expect("chdir to OUT_DIR");
+
+    let output = Command::new("./autogen.sh")
         .output()
-        .expect("untar vendored code");
+        .expect("autogen wiredtiger build");
     if !output.status.success() {
-        panic!("failed to untar: {:?}", output);
+        panic!("failed to autogen: {:?}", output);
+    }
+
+    let output = Command::new("./configure")
+        .output()
+        .expect("configure wiredtiger build");
+    if !output.status.success() {
+        panic!("failed to configure wiredtiger: {:?}", output);
+    }
+
+    let output = Command::new("make")
+        .output()
+        .expect("make wiredtiger");
+    if !output.status.success() {
+        panic!("failed to make wiredtiger: {:?}", output);
     }
 }
