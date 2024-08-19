@@ -4,6 +4,8 @@ version = "0.3.1-rc1" # libwiredtiger v3.1.0
 description = "Rust bindings for libwiredtiger"
 edition = "2021"
 license = "MIT"
+homepage = "https://github.com/ryanpbrewster/wiredtiger-rs"
+repository = "https://github.com/ryanpbrewster/wiredtiger-rs"
 
 [dependencies]
 wiredtiger-sys = { path = "wiredtiger-sys", version = "0.3.1-rc1" } # should always match our version

@@ -5,6 +5,8 @@ version = "0.3.1-rc1" # libwiredtiger v3.1.0
 edition = "2021"
 build = "build.rs"
 license = "MIT"
+homepage = "https://github.com/ryanpbrewster/wiredtiger-rs"
+repository = "https://github.com/ryanpbrewster/wiredtiger-rs"
 
 [build-dependencies]
 bindgen = "0.70.0"
