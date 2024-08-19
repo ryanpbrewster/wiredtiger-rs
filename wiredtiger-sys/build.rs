@@ -11,7 +11,7 @@ fn main() {
     let output = Command::new("cp")
         .arg("-R")
         .arg(format!("vendor/{subdir}"))
-        .arg(out_dir.join(subdir))
+        .arg(&out_dir)
         .output()
         .expect("autogen wiredtiger build");
     if !output.status.success() {
@@ -21,15 +21,6 @@ fn main() {
     }
 
     std::env::set_current_dir(out_dir.join(subdir)).expect("chdir to OUT_DIR");
-
-    eprintln!("starting autogen...");
-    let output = Command::new("./autogen.sh")
-        .output()
-        .expect("autogen wiredtiger build");
-    if !output.status.success() {
-        panic!("failed to autogen: {:?}", output);
-    }
-    eprintln!("done with autogen.sh");
 
     eprintln!("starting configure...");
     let output = Command::new("./configure")
