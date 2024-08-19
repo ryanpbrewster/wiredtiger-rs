@@ -1,0 +1,11 @@
+[package]
+name = "wiredtiger-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wiredtiger-sys = { path = "wiredtiger-sys" }
+
+[dev-dependencies]
+anyhow = "1.0.86"
+tempfile = "3.12.0"

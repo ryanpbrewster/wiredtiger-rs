@@ -1,2 +1,7 @@
 /target/
 /wiredtiger-sys/target/
+
+
+# Added by cargo
+
+/target
