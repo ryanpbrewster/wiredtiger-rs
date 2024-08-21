@@ -1,9 +1,6 @@
 use std::ffi::{c_int, CStr, CString};
 use std::ptr;
-use wiredtiger_sys::{
-    wiredtiger_open, wiredtiger_strerror, WIREDTIGER_VERSION_MAJOR, WIREDTIGER_VERSION_MINOR,
-    WIREDTIGER_VERSION_PATCH, WT_CONNECTION,
-};
+use wiredtiger_sys::{wiredtiger_open, wiredtiger_strerror, WT_CONNECTION};
 
 fn main() {
     println!(

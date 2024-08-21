@@ -2,7 +2,7 @@ use std::{path::PathBuf, process::Command};
 
 fn main() {
     println!("cargo::rerun-if-changed=vendor");
-    let subdir: &str = "wiredtiger-3.1.0";
+    let subdir: &str = "wiredtiger-10.0.0";
 
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").expect("OUT_DIR env var"));
 
@@ -33,7 +33,7 @@ fn main() {
 
     eprintln!("starting make...");
     let output = Command::new("make")
-        .arg("-j4") // TODO(rpb): what is a reasonable value here?
+        .arg("-j16") // TODO(rpb): what is a reasonable value here?
         .output()
         .expect("make wiredtiger");
     if !output.status.success() {
