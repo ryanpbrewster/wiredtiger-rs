@@ -1,5 +1,8 @@
-use std::{ffi::{CStr, CString}, path::Path};
 use crate::error::{Error, Result};
+use std::{
+    ffi::{CStr, CString},
+    path::Path,
+};
 
 use wiredtiger_sys::{WT_CONNECTION, WT_CURSOR, WT_SESSION};
 
@@ -10,6 +13,8 @@ use wiredtiger_sys::{WT_CONNECTION, WT_CURSOR, WT_SESSION};
 pub struct Connection {
     inner: *mut WT_CONNECTION,
 }
+unsafe impl Sync for Connection {}
+unsafe impl Send for Connection {}
 
 impl Connection {
     pub fn open(path: &Path) -> Result<Connection> {
@@ -154,7 +159,9 @@ impl Cursor {
         }
     }
 
-    pub fn insert(&mut self) -> Result<()> {
+    /// # Safety
+    /// Caller must ensure that the cursor has valid a key+value set.
+    pub unsafe fn insert(&mut self) -> Result<()> {
         unsafe {
             let Some(insert) = (*self.inner).insert else {
                 return Err(Error::Placeholder("no insert function pointer".to_owned()));
@@ -167,7 +174,10 @@ impl Cursor {
         }
     }
 
-    pub fn get_key(&mut self) -> Result<&CStr> {
+    /// # Safety
+    /// Caller must ensure that the cursor is in a valid state before invoking this method.
+    /// Caller must ensure that the returned reference is dropped before mutating the cursor
+    pub unsafe fn get_key(&mut self) -> Result<&CStr> {
         unsafe {
             let mut key = std::ptr::null();
             let Some(get_key) = (*self.inner).get_key else {
@@ -181,7 +191,10 @@ impl Cursor {
         }
     }
 
-    pub fn get_value(&mut self) -> Result<&CStr> {
+    /// # Safety
+    /// Caller must ensure that the cursor is in a valid state before invoking this method.
+    /// Caller must ensure that the returned reference is dropped before mutating the cursor
+    pub unsafe fn get_value(&mut self) -> Result<&CStr> {
         unsafe {
             let mut value: *const i8 = std::ptr::null();
             let Some(get_value) = (*self.inner).get_value else {
@@ -197,8 +210,9 @@ impl Cursor {
         }
     }
 
+    /// # Safety
     /// Caller must ensure that `key` stays alive until the cursor is done using it
-    pub fn set_key(&mut self, key: &CStr) -> Result<()> {
+    pub unsafe fn set_key(&mut self, key: &CStr) -> Result<()> {
         unsafe {
             let Some(set_key) = (*self.inner).set_key else {
                 return Err(Error::Placeholder("no set_key function pointer".to_owned()));
@@ -208,8 +222,9 @@ impl Cursor {
         }
     }
 
+    /// # Safety
     /// Caller must ensure that `value` stays alive until the cursor is done using it
-    pub fn set_value(&mut self, value: &CStr) -> Result<()> {
+    pub unsafe fn set_value(&mut self, value: &CStr) -> Result<()> {
         unsafe {
             let Some(set_value) = (*self.inner).set_value else {
                 return Err(Error::Placeholder(
@@ -256,7 +271,7 @@ mod tests {
         let mut conn = Connection::open(dir.path())?;
         assert!(!conn.inner.is_null());
 
-        {
+        unsafe {
             let mut session = conn.open_session()?;
             session.create_table("foo")?;
             let mut cursor = session.open_cursor("foo")?;
@@ -268,11 +283,13 @@ mod tests {
             cursor.insert()?;
         }
 
-        let mut session = conn.open_session()?;
-        let mut cursor = session.open_cursor("foo")?;
-        cursor.advance()?;
-        assert_eq!(cursor.get_key()?, CString::new(b"hello")?.as_c_str());
-        assert_eq!(cursor.get_value()?, CString::new(b"world")?.as_c_str());
+        unsafe {
+            let mut session = conn.open_session()?;
+            let mut cursor = session.open_cursor("foo")?;
+            cursor.advance()?;
+            assert_eq!(cursor.get_key()?, CString::new(b"hello")?.as_c_str());
+            assert_eq!(cursor.get_value()?, CString::new(b"world")?.as_c_str());
+        }
         Ok(())
     }
 }

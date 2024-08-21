@@ -1,5 +1,7 @@
 use std::{
-    ffi::{CStr, CString}, marker::PhantomData, path::Path
+    ffi::{CStr, CString},
+    marker::PhantomData,
+    path::Path,
 };
 
 pub mod error;
@@ -15,15 +17,16 @@ pub struct Connection {
 
 impl Connection {
     pub fn open(path: &Path) -> Result<Connection> {
-        Ok(Connection { inner: raw::Connection::open(path)? })
+        Ok(Connection {
+            inner: raw::Connection::open(path)?,
+        })
     }
 
     pub fn open_session(&mut self) -> Result<Session> {
         Ok(Session {
             inner: self.inner.open_session()?,
             _lifetime: &PhantomData,
-         })
-        
+        })
     }
 }
 
@@ -35,7 +38,7 @@ pub struct Session<'a> {
     _lifetime: &'a PhantomData<()>,
 }
 
-impl <'a> Session<'a> {
+impl<'a> Session<'a> {
     pub fn create_table(&mut self, name: &str) -> Result<()> {
         self.inner.create_table(name)
     }
@@ -43,20 +46,17 @@ impl <'a> Session<'a> {
         Ok(Cursor {
             inner: self.inner.open_cursor(table_name)?,
             _lifetime: &PhantomData,
-         })
+        })
     }
 }
 
-/// Cursors allow data to be searched, iterated and modified, implementing the CRUD (create, read, update and delete) operations. Cursors are opened in the context of a session. If a transaction is started, cursors operate in the context of the transaction until the transaction is resolved.
-/// Raw data is represented by key/value pairs of WT_ITEM structures, but cursors can also provide access to fields within the key and value if the formats are described in the WT_SESSION::create method.
-/// In the common case, a cursor is used to access records in a table. However, cursors can be used on subsets of tables (such as a single column or a projection of multiple columns), as an interface to statistics, configuration data or application-specific data sources. See WT_SESSION::open_cursor for more information.
-/// Thread safety: A WT_CURSOR handle is not usually shared between threads. See Multithreading for more information.
+/// Cursor is a safe wrapper around raw::Cursor. It has appropriate lifetimes and safe methods
 pub struct Cursor<'a> {
     inner: raw::Cursor,
     _lifetime: &'a PhantomData<()>,
 }
 
-impl <'a> Cursor<'a> {
+impl<'a> Cursor<'a> {
     pub fn reset(&'a mut self) -> Result<()> {
         self.inner.reset()
     }
@@ -65,19 +65,22 @@ impl <'a> Cursor<'a> {
         self.inner.advance()
     }
 
-
     pub fn get_key(&mut self) -> Result<CString> {
-        Ok(self.inner.get_key()?.to_owned())
+        let v = unsafe { self.inner.get_key()? };
+        Ok(v.to_owned())
     }
 
     pub fn get_value(&mut self) -> Result<CString> {
-        Ok(self.inner.get_value()?.to_owned())
+        let v = unsafe { self.inner.get_value()? };
+        Ok(v.to_owned())
     }
 
     pub fn put(&mut self, key: &CStr, value: &CStr) -> Result<()> {
-        self.inner.set_key(key)?;
-        self.inner.set_value(value)?;
-        self.inner.insert()?;
+        unsafe {
+            self.inner.set_key(key)?;
+            self.inner.set_value(value)?;
+            self.inner.insert()?;
+        }
         Ok(())
     }
 }

@@ -1,4 +1,7 @@
-use std::{ffi::{c_int, CStr, NulError}, fmt::Display};
+use std::{
+    ffi::{c_int, CStr, NulError},
+    fmt::Display,
+};
 
 use wiredtiger_sys::wiredtiger_strerror;
 
