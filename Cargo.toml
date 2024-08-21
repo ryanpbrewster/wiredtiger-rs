@@ -1,6 +1,6 @@
 [package]
 name = "wiredtiger-rs"
-version = "0.3.1-rc2" # libwiredtiger v3.1.0
+version = "0.10.0-rc0" # libwiredtiger v10.0.0
 description = "Rust bindings for libwiredtiger"
 edition = "2021"
 license = "MIT"
@@ -8,7 +8,7 @@ homepage = "https://github.com/ryanpbrewster/wiredtiger-rs"
 repository = "https://github.com/ryanpbrewster/wiredtiger-rs"
 
 [dependencies]
-wiredtiger-sys = { path = "wiredtiger-sys", version = "0.3.1-rc1" } # should match our major/minor/patch
+wiredtiger-sys = { path = "wiredtiger-sys", version = "0.10.0-rc0" } # should match our major/minor/patch
 
 [dev-dependencies]
 anyhow = "1.0.86"
