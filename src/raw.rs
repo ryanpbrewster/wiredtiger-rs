@@ -20,8 +20,8 @@ impl Connection {
     pub fn open(path: &Path) -> Result<Connection> {
         unsafe {
             let mut connection = std::ptr::null_mut();
-            let home = CString::new(path.as_os_str().as_encoded_bytes().to_vec())?;
-            let config = CString::new("create,statistics=(all)")?;
+            let home = CString::new(path.as_os_str().as_encoded_bytes())?;
+            let config = c"create,statistics=(all)";
             let ret = wiredtiger_sys::wiredtiger_open(
                 home.as_ptr(),
                 std::ptr::null_mut(),
@@ -75,10 +75,10 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn create_table(&mut self, name: &str) -> Result<()> {
+    pub fn create_table(&mut self, table_name: &str) -> Result<()> {
         unsafe {
-            let cmd = CString::new(format!("table:{0}", name))?;
-            let schema = CString::new("key_format=S,value_format=S")?;
+            let cmd = CString::new(format!("table:{table_name}"))?;
+            let schema = c"key_format=S,value_format=S";
             let Some(create) = (*self.inner).create else {
                 return Err(Error::Placeholder("no create function pointer".to_owned()));
             };
@@ -276,10 +276,8 @@ mod tests {
             session.create_table("foo")?;
             let mut cursor = session.open_cursor("foo")?;
 
-            let key = CString::new(b"hello")?;
-            let value = &CString::new(b"world")?;
-            cursor.set_key(&key)?;
-            cursor.set_value(&value)?;
+            cursor.set_key(c"hello")?;
+            cursor.set_value(c"world")?;
             cursor.insert()?;
         }
 
@@ -287,8 +285,8 @@ mod tests {
             let mut session = conn.open_session()?;
             let mut cursor = session.open_cursor("foo")?;
             cursor.advance()?;
-            assert_eq!(cursor.get_key()?, CString::new(b"hello")?.as_c_str());
-            assert_eq!(cursor.get_value()?, CString::new(b"world")?.as_c_str());
+            assert_eq!(cursor.get_key()?, c"hello");
+            assert_eq!(cursor.get_value()?, c"world");
         }
         Ok(())
     }

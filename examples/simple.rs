@@ -1,4 +1,4 @@
-use std::{ffi::CString, path::PathBuf, str::FromStr};
+use std::{path::PathBuf, str::FromStr};
 
 use wiredtiger_rs::Connection;
 
@@ -11,7 +11,7 @@ fn main() -> anyhow::Result<()> {
         let mut session = conn.open_session()?;
         session.create_table(&table)?;
         let mut cursor = session.open_cursor(&table)?;
-        cursor.put(&CString::new("hello")?, &CString::new("world")?)?;
+        cursor.put(c"hello", c"world")?;
     }
 
     {

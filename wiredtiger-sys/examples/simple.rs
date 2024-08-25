@@ -1,4 +1,4 @@
-use std::ffi::{c_int, CStr, CString};
+use std::ffi::{c_int, CStr};
 use std::ptr;
 use wiredtiger_sys::{wiredtiger_open, wiredtiger_strerror, WT_CONNECTION};
 
@@ -10,8 +10,8 @@ fn main() {
         wiredtiger_sys::WIREDTIGER_VERSION_PATCH,
     );
 
-    let dbpath = CString::new("/tmp/wt-example").unwrap();
-    let opts = CString::new("create,statistics=(all)").unwrap();
+    let dbpath = c"/tmp/wt-example";
+    let opts = c"create,statistics=(all)";
 
     let mut conn: *mut WT_CONNECTION = ptr::null_mut();
     unsafe {

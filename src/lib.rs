@@ -111,14 +111,14 @@ mod tests {
             let mut session = conn.open_session()?;
             session.create_table("foo")?;
             let mut cursor = session.open_cursor("foo")?;
-            cursor.put(&CString::new("hello")?, &CString::new("world")?)?;
+            cursor.put(c"hello", c"world")?;
         }
 
         let mut session = conn.open_session()?;
         let mut cursor = session.open_cursor("foo")?;
         cursor.advance()?;
-        assert_eq!(cursor.get_key()?, CString::new("hello")?);
-        assert_eq!(cursor.get_value()?, CString::new("world")?);
+        assert_eq!(cursor.get_key()?, c"hello".into());
+        assert_eq!(cursor.get_value()?, c"world".into());
         Ok(())
     }
 }
